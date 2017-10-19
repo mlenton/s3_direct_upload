@@ -3,6 +3,8 @@
 
 $ = jQuery
 
+# added comment
+
 $.fn.S3Uploader = (options) ->
 
   # support multiple elements
