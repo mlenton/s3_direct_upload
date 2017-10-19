@@ -140,11 +140,15 @@ $.fn.S3Uploader = (options) ->
 
   build_content_object = ($uploadForm, file, result) ->
     content = {}
-    domain                 = $uploadForm.find('input[type=file]').data('url')
-    key                    = $uploadForm.find('input[name=key]').val()
-    content.filepath       = key.replace('/{filename}', '').replace('/{cleaned_filename}', '')
-    content.url            = domain + key.replace('/{filename}', encodeURIComponent(file.name))
-    content.url            = content.url.replace('/{cleaned_filename}', cleaned_filename(file.name))
+    if result # Use the S3 response to set the URL to avoid character encodings bugs
+      content.url            = $(result).find("Location").text()
+      content.filepath       = $('<a />').attr('href', content.url)[0].pathname
+    else # IE <= 9 retu      rn a null result object so we use the file object instead
+      domain                 = $uploadForm.find('input[type=file]').data('url')
+      key                    = $uploadForm.find('input[name=key]').val()
+      content.filepath       = key.replace('/{filename}', '').replace('/{cleaned_filename}', '')
+      content.url            = domain + key.replace('/{filename}', encodeURIComponent(file.name))
+      content.url            = content.url.replace('/{cleaned_filename}', cleaned_filename(file.name))
 
     content.filename         = file.name
     content.filesize         = file.size if 'size' of file
